@@ -17,8 +17,9 @@ Usage example:
 
 This module expects `tantivy` to be installed (pip package `tantivy`).
 """
-from typing import Any, Dict, List, Optional
+
 import os
+from typing import Any
 
 import tantivy
 
@@ -38,9 +39,9 @@ class TantivyIndex:
 
     def __init__(
         self,
-        index_dir: Optional[str] = None,
-        optional_fields: Optional[List[str]] = None,
-        schema_fields: Optional[List[Dict[str, Any]]] = None,
+        index_dir: str | None = None,
+        optional_fields: list[str] | None = None,
+        schema_fields: list[dict[str, Any]] | None = None,
         memory_limit: int = 50_000_000,
     ):
         """Create an index with a default schema.
@@ -98,7 +99,7 @@ class TantivyIndex:
         else:
             self.index = tantivy.Index(self.schema)
 
-    def add_documents(self, docs: List[Dict[str, Any]]) -> None:
+    def add_documents(self, docs: list[dict[str, Any]]) -> None:
         """Add multiple documents to the index and commit.
 
         Documents should be dictionaries mapping field names to values. For text
@@ -112,7 +113,7 @@ class TantivyIndex:
 
         for doc in docs:
             # Build kwargs suitable for tantivy.Document
-            doc_kwargs: Dict[str, Any] = {}
+            doc_kwargs: dict[str, Any] = {}
             for f in self.schema_fields:
                 name = f["name"]
                 ftype = f.get("type", "text")
@@ -130,8 +131,8 @@ class TantivyIndex:
                     # allow strings that represent integers too
                     try:
                         doc_kwargs[name] = int(value)
-                    except Exception:
-                        raise ValueError(f"Field '{name}' expects integer-like values; got: {value}")
+                    except Exception as e:
+                        raise ValueError(f"Field '{name}' expects integer-like values; got: {value}") from e
 
             writer.add_document(tantivy.Document(**doc_kwargs))
 
@@ -142,11 +143,11 @@ class TantivyIndex:
     def search(
         self,
         query_str: str,
-        fields: Optional[List[str]] = None,
+        fields: list[str] | None = None,
         top_k: int = 10,
         include_snippets: bool = False,
         snippet_field: str = "body",
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Search the index and return a list of result dicts.
 
         Each result dict contains the stored fields and a `_score` key. If
@@ -164,11 +165,11 @@ class TantivyIndex:
         query = self.index.parse_query(query_str, fields, fuzzy_fields={"text": (True, 1, True)})
         search_res = searcher.search(query, top_k)
 
-        results: List[Dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
         for score, doc_address in search_res.hits:
             stored = searcher.doc(doc_address)
             # Convert single-element lists to scalars for convenience
-            stored_clean: Dict[str, Any] = {}
+            stored_clean: dict[str, Any] = {}
             for f in self.schema_fields:
                 name = f["name"]
                 # Try common access patterns for tantivy Document-like objects

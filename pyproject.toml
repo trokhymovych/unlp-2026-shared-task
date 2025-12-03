@@ -1,0 +1,78 @@
+[project]
+name = "unlp-2026-shared-task"
+version = "0.1.0"
+description = "unlp 2026 shared task solution"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "joblib>=1.5.2",
+    "pandas>=2.3.3",
+    "pdfplumber>=0.11.8",
+    "pillow>=12.0.0",
+    "pymupdf>=1.26.6",
+    "tantivy>=0.25.1",
+    "tqdm>=4.67.1",
+]
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+    "pre-commit>=4.5.0",
+]
+
+
+[tool.ruff.lint]
+# Select rules for code quality and style
+select = [
+    # Essential code quality
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes (unused imports, undefined variables)
+    "UP",     # pyupgrade (modernize Python syntax)
+    "B",      # flake8-bugbear (likely bugs)
+
+    # Import sorting
+    "I",      # isort (import sorting)
+
+    # Security & best practices
+    "S",      # flake8-bandit (security issues)
+    "N",      # pep8-naming (naming conventions)
+
+    # Code style
+    "COM",    # flake8-commas (trailing commas)
+    "Q",      # flake8-quotes (quote consistency)
+
+    # Clean code
+    "ERA",    # eradicate (commented-out code)
+    "T20",    # flake8-print (print statements)
+]
+
+# Ignore specific rules that might be too strict for your use case
+ignore = [
+    "S101",   # Use of assert (common in tests)
+    "T201",   # Print statements (you might want logging instead)
+    "COM812", # Trailing comma missing (conflicts with formatter)
+    "Q000",   # Single quotes found but double quotes preferred
+    "ERA001", # Commented-out code detected
+    "B018",   # useless expressions are not so useless in airflow DAGs
+]
+exclude = [
+    "data",
+    "notebooks",
+    ".venv",
+    "__pycache__",
+]
+
+[tool.ruff]
+# Set line length to 120 characters
+line-length = 120
+exclude = [
+    "data",
+    "notebooks",
+    ".venv",
+    "__pycache__",
+]
+
+[tool.ruff.lint.isort]
+# Configure import sorting behavior
+force-sort-within-sections = true
