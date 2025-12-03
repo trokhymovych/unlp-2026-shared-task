@@ -1,5 +1,0 @@
-pdfplumber
-PyMuPDF
-pandas
-Pillow
-tantivy

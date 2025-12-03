@@ -7,25 +7,27 @@ Implementation notes:
 - Uses `PyMuPDF` (imported as `fitz`) for robust image extraction when available.
 - Falls back to returning image metadata from `pdfplumber` if `fitz` is not installed.
 """
-from typing import Any, Dict, List, Optional
-import os
 
-import pdfplumber
+import os
+from typing import Any
+
 import pandas as pd
+import pdfplumber
 
 try:
     import fitz  # PyMuPDF
+
     _HAS_FITZ = True
 except Exception:
     _HAS_FITZ = False
 
 
-def _extract_images_with_fitz(pdf_path: str, page_number: int, images_dir: Optional[str]) -> List[Dict[str, Any]]:
+def _extract_images_with_fitz(pdf_path: str, page_number: int, images_dir: str | None) -> list[dict[str, Any]]:
     """Extract images from a single page using PyMuPDF.
 
     Returns a list of dicts with keys: `bytes`, `ext`, `xref`, and optionally `path`.
     """
-    results: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
     doc = fitz.open(pdf_path)
     try:
         page = doc[page_number - 1]
@@ -52,9 +54,9 @@ def _extract_images_with_fitz(pdf_path: str, page_number: int, images_dir: Optio
 def parse_pdf(
     pdf_path: str,
     extract_images: bool = True,
-    images_dir: Optional[str] = None,
-    doc_id: Optional[str] = None,
-) -> Dict[str, Any]:
+    images_dir: str | None = None,
+    doc_id: str | None = None,
+) -> dict[str, Any]:
     """Parse a PDF and return a structure with per-page text, tables and images.
 
     Args:
@@ -71,7 +73,7 @@ def parse_pdf(
         - `images` is a list of dicts. If `fitz` is available, entries contain `bytes`, `ext`, and maybe `path`.
           Otherwise entries have `metadata` from pdfplumber's image info.
     """
-    pages: List[Dict[str, Any]] = []
+    pages: list[dict[str, Any]] = []
 
     with pdfplumber.open(pdf_path) as pdf:
         for page_idx, page in enumerate(pdf.pages, start=1):
@@ -79,7 +81,7 @@ def parse_pdf(
 
             # Extract tables
             raw_tables = page.extract_tables() or []
-            tables: List[pd.DataFrame] = []
+            tables: list[pd.DataFrame] = []
             for raw in raw_tables:
                 try:
                     df = pd.DataFrame(raw)
@@ -88,7 +90,7 @@ def parse_pdf(
                 tables.append(df)
 
             # Extract images
-            images: List[Dict[str, Any]] = []
+            images: list[dict[str, Any]] = []
             if extract_images and _HAS_FITZ:
                 try:
                     images = _extract_images_with_fitz(pdf_path, page_idx, images_dir)
@@ -99,7 +101,15 @@ def parse_pdf(
                 # pdfplumber provides image metadata (no image bytes)
                 images = [{"metadata": img} for img in page.images]
 
-            pages.append({"page_number": page_idx, "doc_id": doc_id, "text": text, "tables": tables, "images": images})
+            pages.append(
+                {
+                    "page_number": page_idx,
+                    "doc_id": doc_id,
+                    "text": text,
+                    "tables": tables,
+                    "images": images,
+                }
+            )
 
     return {"file_path": pdf_path, "doc_id": doc_id, "pages": pages}
 
