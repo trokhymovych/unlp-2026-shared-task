@@ -22,6 +22,10 @@ Kaggle competition is private, but here is a head of a private leaderboard:
 
 ## Steps to reproduce results
 
+Birds-eye view on a solution:
+
+![sol](resources/solution.jpg)
+
 Success story (replication of results) consists of the following steps:
 
 - get the data from shared task [repo](https://github.com/unlp-workshop/unlp-2026-shared-task)
