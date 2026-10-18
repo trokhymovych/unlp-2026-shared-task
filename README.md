@@ -49,3 +49,20 @@ Final kaggle submission notebook with all the steps needed for inference may be 
 ## Building wheels for kaggle example
 
 Since internet usage in kaggle pipeline was disabled and there is a need to install packages beyond default ones, you may need to download packages with deps as binaries and load them to kaggle as datasets.
+
+## Cite:
+```
+@inproceedings{trokhymovych-etal-2026-end,
+  title = {An End-to-End {U}krainian {RAG} for Local Deployment. Optimized Hybrid Search and Lightweight Generation},
+  author = {Trokhymovych, Mykola and Oliinyk, Yana and Nyzhnyk, Nazarii},
+  editor = {Romanyshyn, Mariana},
+  booktitle = {Proceedings of the Fifth {U}krainian Natural Language Processing Conference ({UNLP} 2026)},
+  month = may,
+  year = {2026},
+  address = {Lviv, Ukraine},
+  publisher = {Association for Computational Linguistics},
+  url = {https://aclanthology.org/2026.unlp-1.19/},
+  pages = {223--229},
+  isbn = {979-8-89176-359-3},
+}
+```
